@@ -145,26 +145,32 @@ cabinet.edinos.ru
 # ============================================================
 
 # OZON
-185.73.194.82/32
-185.73.193.68/32
+
+# OZON-AS / AS44386
+185.73.192.0/22
+195.34.20.0/23
+46.226.122.0/24
+91.212.64.0/24
+91.223.93.0/24
+
+# Domains
 ozon.ru
 www.ozon.ru
 api.ozon.ru
 xapi.ozon.ru
 p.ozon.ru
-cdn1.ozonusercontent.com
+
+st.ozone.ru
 cdn1.ozone.ru
 cdn2.ozone.ru
 s.ozone.ru
 ir.ozone.ru
-185.73.193.119
-185.73.195.116
-cdn-qa.ozonru.me
+
+cdn1.ozonusercontent.com
 o3.ru
 ozone.ru
 ozonusercontent.com
 ozonru.me
-st.ozone.ru
 
 # WILDBERRIES
 # AS57073 + AS201512 IPv4 ranges, verified 2026-09-27
