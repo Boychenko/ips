@@ -1,6 +1,6 @@
 # ============================================================
 # BYPASS MASTER LIST
-# Updated: 2026-09-27 — bank ASN/mobile endpoints refreshed
+# Updated: 2026-09-28 — banks refreshed; Aviasales added
 # Format: IPv4 CIDR and hostnames, one entry per line
 # ============================================================
 
@@ -422,6 +422,60 @@ calls.okcdn.ru
 iv.okcdn.ru
 my.com
 # VK-related MAX traffic is already covered by the VK section.
+
+# ============================================================
+# TRAVEL
+# ============================================================
+
+# ------------------------------------------------------------
+# AVIASALES
+# ------------------------------------------------------------
+# Do NOT add whole AWS/CloudFront or Cloudflare ASNs here:
+# Aviasales uses shared CDN infrastructure, so ASN-wide bypass
+# would send a large amount of unrelated traffic outside VPN.
+
+# Main web
+aviasales.ru
+www.aviasales.ru
+aviasales.com
+www.aviasales.com
+
+# Core web frontend / APIs observed on current site
+static.aviasales.com
+flagr.aviasales.com
+ariadne.aviasales.com
+explore-api.aviasales.com
+suggest.aviasales.com
+seo-currency-config.aviasales.com
+tickets-api.aviasales.com
+trap.aviasales.com
+content-admin.aviasales.com
+sp.aviasales.com
+
+# RU endpoints
+sp.aviasales.ru
+tickets-api.aviasales.ru
+suggest.aviasales.ru
+static.aviasales.ru
+min-prices.aviasales.ru
+places.aviasales.ru
+calendar-api.aviasales.ru
+banners-storage.aviasales.ru
+
+# Mobile / app endpoints
+mobile-ha.aviasales.ru
+mobile-personal-account.aviasales.ru
+mobile-ads.aviasales.ru
+mobile-tracking.aviasales.ru
+mobile-explore.aviasales.ru
+ios.aviasales.ru
+
+# Shared Aviasales service domains
+avs.io
+img.avs.io
+auth.avs.io
+sentry-relay.avs.io
+
 
 # ============================================================
 # RETAIL / SERVICES
