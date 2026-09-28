@@ -492,10 +492,11 @@ sentry-relay.avs.io
 91.236.48.0/22
 
 # Main / web / deeplinks
-2gis.ru
+# NOTE: bare 2gis.ru and 2gis.com are intentionally omitted because
+# this importer treats hostnames starting with a digit as invalid IPs.
+# Their current addresses are already covered by 91.236.48.0/22.
 www.2gis.ru
 m.2gis.ru
-2gis.com
 www.2gis.com
 go.2gis.com
 
