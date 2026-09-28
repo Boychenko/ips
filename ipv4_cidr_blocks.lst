@@ -1,6 +1,6 @@
 # ============================================================
 # BYPASS MASTER LIST
-# Updated: 2026-09-28 — banks refreshed; Aviasales + Kontur + Kupipk added
+# Updated: 2026-09-28 — banks, Aviasales, Kontur, Kupipk, EDU22 and питание.дети
 # Format: IPv4 CIDR and hostnames, one entry per line
 # ============================================================
 
@@ -477,6 +477,45 @@ avs.io
 img.avs.io
 auth.avs.io
 sentry-relay.avs.io
+
+
+# ============================================================
+# EDUCATION / SCHOOL SERVICES
+# ============================================================
+
+# ------------------------------------------------------------
+# ALTAI KRAI EDUCATION — EDU22.INFO
+# ------------------------------------------------------------
+# AS209885 — Altai Regional Information / education systems.
+# The whole ASN currently consists of 91.90.210.0/24, so this
+# covers edu22.info subdomains even when wildcard hostnames are
+# unsupported by the bypass importer.
+91.90.210.0/24
+
+# Main portal
+edu22.info
+www.edu22.info
+
+# Regional education information systems
+netschool.edu22.info
+neteducation.edu22.info
+eso.edu22.info
+netspo.edu22.info
+rs.edu22.info
+eor.edu22.info
+
+# ------------------------------------------------------------
+# ПИТАНИЕ.ДЕТИ — JSC SETTLEMENT SOLUTIONS
+# ------------------------------------------------------------
+# Punycode for питание.дети:
+xn--80akhbyjw.xn--d1acj3b
+
+# AS198255 network currently serving питание.дети
+91.232.246.0/24
+
+# Operator / support
+ao-rr.ru
+www.ao-rr.ru
 
 
 # ============================================================
