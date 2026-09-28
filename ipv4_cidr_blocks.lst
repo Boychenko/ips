@@ -1,6 +1,6 @@
 # ============================================================
 # BYPASS MASTER LIST
-# Updated: 2026-09-28 — banks refreshed; Aviasales added
+# Updated: 2026-09-28 — banks refreshed; Aviasales + Kontur endpoints added
 # Format: IPv4 CIDR and hostnames, one entry per line
 # ============================================================
 
@@ -238,6 +238,8 @@ lk.edo.ru
 46.17.206.11/32
 kontur.ru
 www.kontur.ru
+api.kontur.ru
+frontreport-relay.kontur.host
 elba.kontur.ru
 kontur-elba.ru
 skbkontur.ru
@@ -252,7 +254,6 @@ otchet.kontur.ru
 zakupki.kontur.ru
 school.kontur.ru
 b-kontur.ru
-frontreport-relay.kontur.host
 
 # EDIN / EDINOS
 81.26.180.191/32
