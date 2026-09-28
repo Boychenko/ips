@@ -1,6 +1,6 @@
 # ============================================================
 # BYPASS MASTER LIST
-# Updated: 2026-09-28 — banks refreshed; Aviasales + Kontur endpoints added
+# Updated: 2026-09-28 — banks refreshed; Aviasales + Kontur + Kupipk added
 # Format: IPv4 CIDR and hostnames, one entry per line
 # ============================================================
 
@@ -526,6 +526,10 @@ forum.dns-shop.ru
 178.248.232.80/32
 sportmaster.ru
 www.sportmaster.ru
+
+# KUPIPK
+kupipk.ru
+www.kupipk.ru
 
 # RED WINGS
 91.215.43.65/32
