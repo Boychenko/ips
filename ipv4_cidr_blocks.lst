@@ -1,6 +1,6 @@
 # ============================================================
 # BYPASS MASTER LIST
-# Updated: 2026-09-28 — banks, Aviasales, Kontur, Kupipk, 2GIS, EDU22 and питание.дети
+# Updated: 2026-09-29 — added GSM22 + GOV.RU/PRAVO.GOV.RU RSNET ranges
 # Format: IPv4 CIDR and hostnames, one entry per line
 # ============================================================
 
@@ -211,6 +211,30 @@ dom.gosuslugi.ru
 pos.gosuslugi.ru
 fssp.gosuslugi.ru
 gosweb.gosuslugi.ru
+
+# ------------------------------------------------------------
+# GOV.RU / PRAVO.GOV.RU / RSNET
+# ------------------------------------------------------------
+# AS8291 (RSNET) + AS43797 (RSNET2), Federal Guard Service.
+# Aggregate ranges cover gov.ru / pravo.gov.ru services even
+# though wildcard hostnames are not supported by the importer.
+95.173.128.0/19
+194.226.80.0/20
+194.226.116.0/22
+185.183.174.0/23
+
+# Main government portal
+gov.ru
+www.gov.ru
+ns.gov.ru
+
+# Official legal information portal
+pravo.gov.ru
+www.pravo.gov.ru
+publication.pravo.gov.ru
+www.publication.pravo.gov.ru
+ips.pravo.gov.ru
+
 
 # FEDERAL TAX SERVICE / NALOG
 195.208.66.236/32
@@ -637,6 +661,10 @@ forum.dns-shop.ru
 178.248.232.80/32
 sportmaster.ru
 www.sportmaster.ru
+
+# GSM22
+gsm22.ru
+www.gsm22.ru
 
 # KUPIPK
 kupipk.ru
