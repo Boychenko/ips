@@ -1,6 +1,6 @@
 # ============================================================
 # BYPASS MASTER LIST
-# Updated: 2026-09-29 — added GSM22 + GOV.RU/PRAVO.GOV.RU RSNET ranges
+# Updated: 2026-10-02 — added Raiffeisenbank AS31174 + official endpoints
 # Format: IPv4 CIDR and hostnames, one entry per line
 # ============================================================
 
@@ -193,6 +193,40 @@ t-static.ru
 # Messaging / support
 tmsg.tbank.ru
 tmsg.phoenix-ca.ru
+
+# ------------------------------------------------------------
+# RAIFFEISENBANK
+# ------------------------------------------------------------
+# AS31174 — AO RAIFFEISENBANK
+# Entire current IPv4 space originated by the bank.
+193.28.44.0/24
+195.238.72.0/24
+195.238.73.0/24
+
+# Official bank sites
+raiffeisen.ru
+www.raiffeisen.ru
+raiffeisenbank.ru
+www.raiffeisenbank.ru
+rzb.ru
+www.rzb.ru
+raif.ru
+www.raif.ru
+
+# Retail / mobile / online banking
+online.raiffeisen.ru
+
+# Business / corporate
+rbo.raiffeisen.ru
+
+# API / integrations
+developer.raiffeisen.ru
+openapi.raif.ru
+e-commerce.raiffeisen.ru
+
+# Related official service
+skidki.raiffeisen.ru
+
 
 # ============================================================
 # GOVERNMENT
