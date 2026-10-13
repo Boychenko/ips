@@ -1,0 +1,186 @@
+name: Update Russian VPN bypass list
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '27 3 * * *'  # Daily, UTC
+  push:
+    branches: [main]
+    paths:
+      - custom.lst
+      - .github/workflows/update-bypass.yml
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: update-bypass-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build ipv4_cidr_blocks.lst
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import ipaddress
+          import os
+          import re
+          import time
+          from pathlib import Path
+          from urllib.request import Request, urlopen
+
+          OUTPUT = Path('ipv4_cidr_blocks.lst')
+          CUSTOM = Path('custom.lst')
+
+          # Preserve your existing manually maintained rules on the first run.
+          if not CUSTOM.exists():
+              CUSTOM.write_text(
+                  OUTPUT.read_text(encoding='utf-8') if OUTPUT.exists() else '',
+                  encoding='utf-8',
+              )
+              print('Created custom.lst from the previous list')
+
+          SOURCES = {
+              'RU IPv4': [
+                  'https://www.ipdeny.com/ipblocks/data/aggregated/ru-aggregated.zone',
+                  'https://raw.githubusercontent.com/ipverse/country-ip-blocks/master/country/ru/ipv4-aggregated.txt',
+              ],
+              'Russian service domains': [
+                  'https://raw.githubusercontent.com/Noktomezo/RussiaFancyLists/main/lists/whitelist/domains.lst',
+              ],
+              'Russian direct-only domains': [
+                  'https://raw.githubusercontent.com/itdoginfo/allow-domains/main/Russia/outside-raw.lst',
+              ],
+          }
+
+          def download(url):
+              for attempt in range(3):
+                  try:
+                      request = Request(url, headers={'User-Agent': 'flint2-bypass-builder/1.0'})
+                      with urlopen(request, timeout=35) as response:
+                          data = response.read(2_000_001)
+                      if len(data) > 2_000_000:
+                          raise ValueError('Source too large')
+                      return data.decode('utf-8-sig')
+                  except Exception as exc:
+                      print(f'Attempt {attempt + 1} failed: {url}: {exc}')
+                      if attempt < 2:
+                          time.sleep(3)
+              raise RuntimeError(f'Cannot download {url}')
+
+          def get_source(name, urls, minimum):
+              for url in urls:
+                  try:
+                      content = download(url)
+                      count = len([line for line in content.splitlines()
+                                   if line.strip() and not line.lstrip().startswith('#')])
+                      if count < minimum:
+                          raise ValueError(f'Only {count} entries (expected >= {minimum})')
+                      print(f'{name}: {count} entries from {url}')
+                      return content
+                  except Exception as exc:
+                      print(f'{name}: {exc}')
+              raise RuntimeError(f'No working source for {name}; output was not changed')
+
+          ip_text = get_source('RU IPv4', SOURCES['RU IPv4'], 1000)
+          service_text = get_source('Russian service domains', SOURCES['Russian service domains'], 100)
+          direct_text = get_source('Russian direct-only domains', SOURCES['Russian direct-only domains'], 10)
+          custom_text = CUSTOM.read_text(encoding='utf-8-sig')
+
+          networks = set()
+          domains = set()
+          skipped = []
+          label_re = re.compile(r'[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\Z')
+
+          for raw in (ip_text + '\n' + service_text + '\n' + direct_text + '\n' + custom_text).splitlines():
+              item = raw.partition('#')[0].strip().lower()
+              if not item:
+                  continue
+              try:
+                  net = ipaddress.ip_network(item, strict=False)
+              except ValueError:
+                  pass
+              else:
+                  if net.version == 4 and net.prefixlen > 0:
+                      networks.add(net)
+                  else:
+                      skipped.append(item)
+                  continue
+
+              # No wildcard syntax in GL.iNet lists: a root domain covers subdomains.
+              item = item.removeprefix('*.').strip('.')
+              try:
+                  item = item.encode('idna').decode('ascii')
+              except UnicodeError:
+                  skipped.append(item)
+                  continue
+
+              # GL.iNet may reject domains beginning with digits as invalid IPs.
+              # For 00.img.avito.st, use the valid parent img.avito.st.
+              while item and item[0].isdigit() and item.count('.') >= 2:
+                  item = item.split('.', 1)[1]
+              parts = item.split('.')
+              if (not item or item[0].isdigit() or len(item) > 253
+                      or len(parts) < 2 or not all(label_re.fullmatch(p) for p in parts)):
+                  skipped.append(item)
+              else:
+                  domains.add(item)
+
+          # A root domain (e.g. ozon.ru) already covers www.ozon.ru and api.ozon.ru.
+          compact_domains = []
+          for domain in sorted(domains):
+              parts = domain.split('.')
+              if not any('.'.join(parts[i:]) in domains for i in range(1, len(parts) - 1)):
+                  compact_domains.append(domain)
+
+          # Merge adjacent/overlapping IPv4 CIDRs WITHOUT broadening coverage.
+          cidrs = sorted(ipaddress.collapse_addresses(networks),
+                        key=lambda n: (int(n.network_address), n.prefixlen))
+          result = [str(n) for n in cidrs] + compact_domains
+          if len(cidrs) < 1000 or len(compact_domains) < 20:
+              raise RuntimeError('Output looks incomplete; refusing to overwrite existing list')
+
+          OUTPUT.write_text('\n'.join(result) + '\n', encoding='utf-8')
+          print(f'Generated {OUTPUT}: {len(cidrs)} IPv4 networks + '
+                f'{len(compact_domains)} domains = {len(result)} rules')
+          print(f'Ignored malformed or incompatible entries: {len(skipped)}')
+          print('Examples:', skipped[:12])
+          with open(os.environ['GITHUB_STEP_SUMMARY'], 'a', encoding='utf-8') as summary:
+              summary.write(f'Generated **{len(result)} rules**: '
+                            f'{len(cidrs)} IPv4 networks and '
+                            f'{len(compact_domains)} domains.\n\n'
+                            f'Ignored **{len(skipped)}** unsupported entries.\n')
+          PY
+
+      - name: Create or update pull request
+        id: pr
+        uses: peter-evans/create-pull-request@v8
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          base: main
+          branch: automation/update-russian-bypass
+          add-paths: |
+            ipv4_cidr_blocks.lst
+            custom.lst
+          commit-message: 'chore: update Russian VPN bypass list'
+          title: 'chore: update Russian VPN bypass list'
+          body: |
+            Automated update of the Flint 2 VPN bypass list.
+
+            - Refreshes Russian IPv4 CIDRs and selected domains from upstream sources.
+            - Merges entries from `custom.lst`.
+            - Validates, deduplicates, and compacts the resulting rules.
+
+            Review the diff before merging. The live list on `main` remains unchanged until merge.
+          delete-branch: true
+
+      - name: PR summary
+        if: steps.pr.outputs.pull-request-number != ''
+        run: |
+          echo "Pull request: ${{ steps.pr.outputs.pull-request-url }}" >> "$GITHUB_STEP_SUMMARY"
