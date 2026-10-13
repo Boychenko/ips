@@ -192,7 +192,6 @@ jobs:
             Automated update of the Flint 2 VPN bypass list.
 
             - Refreshes Russian IPv4 CIDRs from IPverse detailed country allocations and selected domains from upstream sources.
-            - Verifies that the Almaty AWG server (188.225.31.67) is not included in Russia's country list.
             - Merges entries from `custom.lst`.
             - Validates, deduplicates, and compacts the resulting rules.
 
