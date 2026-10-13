@@ -47,9 +47,11 @@ jobs:
               print('Created custom.lst from the previous list')
 
           SOURCES = {
+              # Detailed network-registration data; unlike broad country allocation
+              # lists, this currently excludes Kazakhstan 188.225.31.0/24.
+              # Intentionally no coarse-list fallback: don't silently reintroduce it.
               'RU IPv4': [
-                  'https://www.ipdeny.com/ipblocks/data/aggregated/ru-aggregated.zone',
-                  'https://raw.githubusercontent.com/ipverse/country-ip-blocks/master/country/ru/ipv4-aggregated.txt',
+                  'https://raw.githubusercontent.com/ipverse/geo-ip-blocks/master/country/ru/ru-ipv4.txt',
               ],
               'Russian service domains': [
                   'https://raw.githubusercontent.com/Noktomezo/RussiaFancyLists/main/lists/whitelist/domains.lst',
@@ -92,6 +94,22 @@ jobs:
           service_text = get_source('Russian service domains', SOURCES['Russian service domains'], 100)
           direct_text = get_source('Russian direct-only domains', SOURCES['Russian direct-only domains'], 10)
           custom_text = CUSTOM.read_text(encoding='utf-8-sig')
+
+          # Fail safely if upstream ever puts our Kazakhstan AWG server back
+          # inside Russia's country ranges. custom.lst can still contain the
+          # server's /32 DIRECT rule: this check applies only to upstream RU data.
+          almaty_ip = ipaddress.ip_address('188.225.31.67')
+          ru_networks = [
+              ipaddress.ip_network(line.partition('#')[0].strip(), strict=False)
+              for line in ip_text.splitlines()
+              if line.partition('#')[0].strip()
+          ]
+          if any(almaty_ip in net for net in ru_networks):
+              raise RuntimeError(
+                  'RU source now includes AWG Almaty 188.225.31.67; '
+                  'review upstream country classification before merging'
+              )
+          print('Checked: Kazakhstan AWG 188.225.31.67 is outside RU source')
 
           networks = set()
           domains = set()
@@ -173,7 +191,8 @@ jobs:
           body: |
             Automated update of the Flint 2 VPN bypass list.
 
-            - Refreshes Russian IPv4 CIDRs and selected domains from upstream sources.
+            - Refreshes Russian IPv4 CIDRs from IPverse detailed country allocations and selected domains from upstream sources.
+            - Verifies that the Almaty AWG server (188.225.31.67) is not included in Russia's country list.
             - Merges entries from `custom.lst`.
             - Validates, deduplicates, and compacts the resulting rules.
 
